@@ -1,0 +1,134 @@
+@import "tailwindcss";
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+  --yellow-primary: #fbbf24;
+  --yellow-secondary: #fcd34d;
+  --yellow-light: #fef3c7;
+  --yellow-dark: #d97706;
+}
+
+:root {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-inter);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+    --yellow-primary: #f59e0b;
+    --yellow-secondary: #fbbf24;
+    --yellow-light: #fef3c7;
+    --yellow-dark: #b45309;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans), Arial, Helvetica, sans-serif;
+}
+
+/* Forest background placeholder - will be replaced with actual image */
+.forest-background {
+  background: linear-gradient(
+    135deg,
+    #1a4d3a 0%,
+    #2d5a3d 25%,
+    #1e4b37 50%,
+    #0f3d2a 75%,
+    #1a4d3a 100%
+  );
+  background-size: 400% 400%;
+  animation: forestGradient 15s ease infinite;
+}
+
+@keyframes forestGradient {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.5);
+}
+
+/* Yellow utility classes */
+.text-yellow {
+  color: var(--yellow-primary);
+}
+
+.text-yellow-light {
+  color: var(--yellow-light);
+}
+
+.text-yellow-dark {
+  color: var(--yellow-dark);
+}
+
+.bg-yellow {
+  background-color: var(--yellow-primary);
+}
+
+.bg-yellow-light {
+  background-color: var(--yellow-light);
+}
+
+.bg-yellow-dark {
+  background-color: var(--yellow-dark);
+}
+
+.border-yellow {
+  border-color: var(--yellow-primary);
+}
+
+/* Yellow accent elements */
+.yellow-accent {
+  background: linear-gradient(45deg, var(--yellow-primary), var(--yellow-secondary));
+  color: #000;
+  padding: 0.5rem 1rem;
+  border-radius: 0.375rem;
+  font-weight: 600;
+}
+
+.yellow-highlight {
+  background-color: var(--yellow-light);
+  color: var(--yellow-dark);
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+}
+
+/* Yellow button styles */
+.btn-yellow {
+  background-color: var(--yellow-primary);
+  color: #000;
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-yellow:hover {
+  background-color: var(--yellow-dark);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(251, 191, 36, 0.4);
+}
