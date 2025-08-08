@@ -1,7 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import Navbar from "./Navbar";
+import { useRouter } from "next/navigation";
+import { useAuth } from "(auth)/(contexts)/AuthContext";
+import Navbar from "../(components)/Navbar";
 
 function validatePassword(value) {
   const minLength = /.{8,}/;
@@ -21,14 +23,29 @@ export default function Home() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [passwordError, setPasswordError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [loginError, setLoginError] = useState("");
+  const { login } = useAuth();
+  const router = useRouter();
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
     const error = validatePassword(password);
     setPasswordError(error);
     if (error) return;
-    // Login logic will be implemented later
-    console.log("Login attempt:", { email, password });
+    
+    setIsLoading(true);
+    setLoginError("");
+    
+    const result = await login(email, password);
+    
+    if (result.success) {
+      router.push("/dashboard");
+    } else {
+      setLoginError(result.error || "Login failed. Please try again.");
+    }
+    
+    setIsLoading(false);
   };
 
   return (
@@ -60,6 +77,12 @@ export default function Home() {
             <p className="text-gray-600 mb-6">Enter your credentials below to sign in.</p>
 
             <form onSubmit={handleLogin} className="space-y-4">
+              {loginError && (
+                <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md text-sm">
+                  {loginError}
+                </div>
+              )}
+              
               <div>
                 <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
                   Email
@@ -72,6 +95,7 @@ export default function Home() {
                   placeholder="projectowner@gmail.com"
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent text-black"
                   required
+                  disabled={isLoading}
                 />
               </div>
 
@@ -90,6 +114,7 @@ export default function Home() {
                   placeholder="••••••••"
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent text-black"
                   required
+                  disabled={isLoading}
                 />
                 {passwordError && (
                   <span className="text-red-500 text-sm block mt-1">{passwordError}</span>
@@ -103,10 +128,10 @@ export default function Home() {
 
               <button
                 type="submit"
-                className="w-full bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700 transition-colors font-medium"
-                disabled={!!passwordError}
+                className="w-full bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                disabled={!!passwordError || isLoading}
               >
-                Log in
+                {isLoading ? "Logging in..." : "Log in"}
               </button>
             </form>
 

@@ -1,7 +1,9 @@
 "use client";
 import { useState, useRef } from 'react';
 import Link from 'next/link';
-import Navbar from '../Navbar';
+import { useRouter } from 'next/navigation';
+import { useAuth } from '../(contexts)/AuthContext';
+import Navbar from '../(components)/Navbar';
 
 function validatePassword(value) {
   const minLength = /.{8,}/;
@@ -23,17 +25,41 @@ export default function Signup() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [passwordError, setPasswordError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [signupError, setSignupError] = useState("");
   const inputsRef = useRef([]);
+  const { signup } = useAuth();
+  const router = useRouter();
 
-  const handleSignupSubmit = (e) => {
+  const handleSignupSubmit = async (e) => {
     e.preventDefault();
     const error = validatePassword(password);
     setPasswordError(error);
     if (error) return;
+    
     if (!showVerification) {
       setShowVerification(true);
+      setSignupError("");
     } else {
       // Handle final sign up with code
+      const verificationCode = code.join('');
+      if (verificationCode.length !== 5) {
+        setSignupError('Please enter the complete verification code.');
+        return;
+      }
+      
+      setIsLoading(true);
+      setSignupError("");
+      
+      const result = await signup(email, password, verificationCode);
+      
+      if (result.success) {
+        router.push("/dashboard");
+      } else {
+        setSignupError(result.error || "Signup failed. Please try again.");
+      }
+      
+      setIsLoading(false);
     }
   };
 
@@ -79,6 +105,12 @@ export default function Signup() {
           <h2 className="text-2xl font-bold text-black mb-2 text-center">Sign up</h2>
           <p className="text-gray-600 mb-6 text-center">Enter your credentials below to sign in.</p>
           <form className="space-y-4" onSubmit={handleSignupSubmit}>
+            {signupError && (
+              <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md text-sm">
+                {signupError}
+              </div>
+            )}
+            
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">Email</label>
               <input
@@ -89,7 +121,7 @@ export default function Signup() {
                 onChange={e => setEmail(e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-600 focus:border-transparent text-black"
                 required
-                disabled={showVerification}
+                disabled={showVerification || isLoading}
               />
             </div>
             <div>
@@ -105,7 +137,7 @@ export default function Signup() {
                 }}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-600 focus:border-transparent text-black"
                 required
-                disabled={showVerification}
+                disabled={showVerification || isLoading}
               />
               {passwordError && (
                 <span className="text-red-500 text-sm block mt-1">{passwordError}</span>
@@ -114,6 +146,7 @@ export default function Signup() {
             {showVerification && (
               <div className="transition-all duration-300">
                 <label className="block text-sm font-medium text-gray-700 mb-1 text-center">Verification Code</label>
+                <p className="text-sm text-gray-600 text-center mb-3">Enter <strong>12345</strong> for demo purposes</p>
                 <div className="flex gap-2 justify-center mb-2 mt-2">
                   {code.map((digit, index) => (
                     <input
@@ -126,6 +159,7 @@ export default function Signup() {
                       onKeyDown={e => handleKeyDown(index, e)}
                       ref={el => (inputsRef.current[index] = el)}
                       className="w-12 h-12 border-2 border-black rounded text-center text-xl font-bold text-black bg-white focus:outline-none focus:ring-2 focus:ring-green-600"
+                      disabled={isLoading}
                     />
                   ))}
                 </div>
@@ -133,10 +167,10 @@ export default function Signup() {
             )}
             <button
               type="submit"
-              className="w-full bg-green-700 text-white py-2 px-4 rounded-md hover:bg-green-800 transition-colors font-medium mt-2"
-              disabled={!!passwordError}
+              className="w-full bg-green-700 text-white py-2 px-4 rounded-md hover:bg-green-800 transition-colors font-medium mt-2 disabled:opacity-50 disabled:cursor-not-allowed"
+              disabled={!!passwordError || isLoading}
             >
-              {showVerification ? 'Sign up' : 'Get Verification Code Via Email'}
+              {isLoading ? 'Processing...' : (showVerification ? 'Sign up' : 'Get Verification Code Via Email')}
             </button>
           </form>
           <p className="text-center text-sm text-gray-600 mt-6">
