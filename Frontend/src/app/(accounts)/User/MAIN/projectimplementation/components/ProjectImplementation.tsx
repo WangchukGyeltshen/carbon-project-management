@@ -42,7 +42,7 @@ const statusLabels: Record<string, string> = {
   Deferred: "Deferred",
 };
 
-function StatusPill({ status }: { status: ActivityStatus }): JSX.Element {
+function StatusPill({ status }: { status: ActivityStatus }): React.ReactElement {
   return (
     <span className={`px-3 py-1 rounded-full text-xs font-semibold ${statusColors[status] || "text-gray-700 bg-gray-100"}`}>
       {statusLabels[status] || status}
@@ -55,7 +55,7 @@ const userProjects = [
   { id: 2, name: "Bumthang Solar Project" },
 ];
 
-export default function ProjectImplementation(): JSX.Element {
+export default function ProjectImplementation(): React.ReactElement {
   const router = useRouter();
   const [modalOpen, setModalOpen] = useState<boolean>(false);
   const [selected, setSelected] = useState<ActivityItem | null>(null);
